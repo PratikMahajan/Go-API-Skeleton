@@ -1,0 +1,59 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: go-app-twitter
+  labels:
+    app: twitter
+    env: dev
+spec:
+  replicas: 3
+  selector:
+    app: twitter
+    env: dev
+  template:
+    metadata:
+      labels:
+        app: twitter
+        env: dev
+    spec:
+      containers:
+        - name: go-app-twitter
+          image: quay.io/pratikmahajan/go-app-twitter:staging-latest
+          env:
+            - name: APP_HTTP_ADDR
+              value: ":5000"
+            - name: APP_ACCESSTOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: go-twitter-secret
+                  key: APP_ACCESSTOKEN
+            - name: APP_ACCESSTOKENSECRET
+              valueFrom:
+                secretKeyRef:
+                  name: go-twitter-secret
+                  key: APP_ACCESSTOKENSECRET
+            - name: APP_APIKEY
+              valueFrom:
+                secretKeyRef:
+                  name: go-twitter-secret
+                  key: APP_APIKEY
+            - name:  APP_APISECRETKEY
+              valueFrom:
+                secretKeyRef:
+                  name: go-twitter-secret
+                  key:  APP_APISECRETKEY
+          ports:
+            - name: http
+              containerPort: 5000
+              protocol: TCP
+          imagePullPolicy: Always
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP

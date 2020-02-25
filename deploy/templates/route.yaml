@@ -1,0 +1,16 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: go-twitter-app
+  labels:
+    app: twitter
+    env: dev
+spec:
+  to:
+    kind: Service
+    name: go-app-twitter
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: edge
